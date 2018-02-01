@@ -1,11 +1,11 @@
-function [ RB ] = RBody( nel, itype, nint, thic, fb, XX)
+function [ RS ] = RBody( nel, itype, nint, thic, fs, XX)
 %program
 %   to calculate isoparametric quadrilateral element mass matrix for
 %   axisymmetric, plane stress, and plane strain conditions
 
 %---input variables--------------------------------------------------------
 %   nel = number of element
-%   fb = element body force (2,4) fbx,fby at 4 corner points
+%   fs = element surface load force (2,4) fbx,fby at 2 corner points = 0
 %   itype = element type
 %           eq.0 = axisymmetric
 %           eq.1 = plane strain
@@ -14,7 +14,7 @@ function [ RB ] = RBody( nel, itype, nint, thic, fb, XX)
 %   thic = thickness of element
 %   XX(2,4) = element node coordinates
 %---output variables-------------------------------------------------------
-%   RB(8,1) = calculated element body force at u1v1, u2v2, u3v3, u4v4 
+%   RS(8,1) = calculated element body force at u1v1, u2v2, u3v3, u4v4 
 %
 RB = zeros(8,1);            % body force for u1v1 u2v2 u3v3 u4v4... 
 XG = [0,0,0,0;...           % gauss-legendre sampling points
@@ -34,17 +34,20 @@ for lx = 1:nint
     RI = XG(lx,nint);
     for ly = 1:nint
         SI = XG(ly,nint);
-        [ H,det,xbar,fB ] = IPMRB( XX,R,S,nel,fb,itype);
+        [ H,det,xbar,fS ] = IPMRB( XX,R,S,nel,fs,itype);
         if (itype > 0)
             xbar = thic;
         end
         
-        WT = WGT(lx,nint)*WGT(ly,nint)*xbar*det*fB;
-        RB = RB + H'*WT;
+        WT = WGT(lx,nint)*WGT(ly,nint)*xbar*det*fS;
+        RS = RS + H'*WT;
 
     end
 end
 
+
+
+end
 
 
 end
